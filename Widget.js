@@ -463,9 +463,9 @@ define([
 				}
 				actions += '<span class="zoom grey-button" id="draw-action-zoom--' + i + '" title="' + this.nls.zoomLabel + '">&nbsp;</span>';
 
-				var checked = (graphic.checked) ? ' checked="checked"' : '';
+				//var checked = (graphic.checked) ? ' checked="checked"' : '';
 
-				var html = '<td><input type="checkbox" class="td-checkbox" id="draw-action-checkclick--' + i + '" ' + checked + '/></td>'
+				var html = '<td><input type="checkbox" class="td-checkbox" id="draw-action-checkclick--' + i + '" ' + "checked" + '/></td>'
 					 + '<td>' + name + '</td>'
 					 + '<td class="td-center" id="draw-symbol--' + i + '">' + symbolHtml + '</td>'
 					 + '<td class="' + actions_class + '">' + actions + '</td>';
@@ -619,8 +619,22 @@ define([
 			var check = evt.target.checked;
 
 			for (var i = 0, nb = this.drawBox.drawLayer.graphics.length; i < nb; i++) {
-				this.drawBox.drawLayer.graphics[i].checked = check;
-				dom.byId('draw-action-checkclick--' + i).checked = check;
+                
+                
+				  //EC Start
+                    var g = this.drawBox.drawLayer.graphics[i];
+                    //EC Stop
+                    this.drawBox.drawLayer.graphics[i].checked = check;
+                    dom.byId('draw-action-checkclick--' + i).checked = check;
+
+                    //EC Start
+                    if (check) {
+                        g.show();
+                    } else {
+                        g.hide();
+                    }
+                    //EC End
+
 			}
 			this.listCheckboxAll.checked = check;
 			this.listCheckboxAll.indeterminate = false;
@@ -680,6 +694,25 @@ define([
 				break;
 			case 'draw-action-checkclick':
 				g.checked = evt.target.checked;
+                    
+                     //EC Start
+                    $('#draw-action-checkclick--' + i).click(function () {
+                        if (this.checked) {
+                            //domStyle.set(node, "display", "none");
+                            g.show();
+                            console.log("Checked");
+                            console.log(selected);
+                            //console.log(checked);
+                            //console.log(selected);
+                        } else {
+                            (!this.checked)
+                            g.hide();
+                            console.log("Not Checked");
+                            console.log(selected);
+
+                        }
+                    })
+                      //EC End
 				this.listUpdateAllCheckbox();
 				break;
 			}
@@ -1178,10 +1211,12 @@ define([
             };
 
             //Create datasource and download !
+            var filename = $("#input-fileName").val()
             var ds = exportUtils.createDataSource({
                 "type" : exportUtils.TYPE_FEATURESET,
                 "data": drawing_seems_featureset,
-                "filename" : (this.config.exportFileName) ? (this.config.exportFileName) : 'myDrawings'
+                 "filename" : (filename+".txt") ? (filename) : 'myDrawings'
+                //"filename" : (this.config.exportFileName) ? (this.config.exportFileName) : 'myDrawings'
             });
             ds.setFormat(exportUtils.FORMAT_FEATURESET)
             ds.download();
