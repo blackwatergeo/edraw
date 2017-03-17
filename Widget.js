@@ -223,11 +223,11 @@ define([
 				return;
 			localStore.set(this._localStorageKey, this.drawingsGetJson());
 		},
-
+		//JE edit
 		getCheckedGraphics : function (returnAllIfNoneChecked) {
 			var graphics = [];
 			for (var i = 0, nb = this.drawBox.drawLayer.graphics.length; i < nb; i++)
-				if (this.drawBox.drawLayer.graphics[i].checked)
+				if (this.drawBox.drawLayer.graphics[i].visible)
 					graphics.push(this.drawBox.drawLayer.graphics[i]);
 
 			if (returnAllIfNoneChecked && graphics.length == 0)
@@ -462,10 +462,11 @@ define([
 					actions_class = "list-draw-actions";
 				}
 				actions += '<span class="zoom grey-button" id="draw-action-zoom--' + i + '" title="' + this.nls.zoomLabel + '">&nbsp;</span>';
-
-				var checked = (graphic.checked) ? ' checked="checked"' : '';
-
+				//JE add
+				var checked = (graphic.visible) ? ' checked="checked"' : '';
+				//var checked = (graphic.checked) ? ' checked="checked"' : '';
 				var html = '<td><input type="checkbox" class="td-checkbox" id="draw-action-checkclick--' + i + '" ' + checked + '/></td>'
+				//var html = '<td><input type="checkbox" class="td-checkbox" id="draw-action-checkclick--' + i + '" ' + 'checked' + '/></td>'
 					 + '<td>' + name + '</td>'
 					 + '<td class="td-center" id="draw-symbol--' + i + '">' + symbolHtml + '</td>'
 					 + '<td class="' + actions_class + '">' + actions + '</td>';
@@ -587,9 +588,9 @@ define([
 			if (evt === undefined) {
 				var all_checked = true;
 				var all_unchecked = true;
-
+				//JE edit
 				for (var i = 0, nb = this.drawBox.drawLayer.graphics.length; i < nb; i++) {
-					if (this.drawBox.drawLayer.graphics[i].checked)
+					if (this.drawBox.drawLayer.graphics[i].visible)
 						all_unchecked = false;
 					else
 						all_checked = false;
@@ -610,17 +611,24 @@ define([
 					this.listCheckboxAll.indeterminate = true;
 					this.listCheckboxAll2.checked = true;
 					this.listCheckboxAll2.indeterminate = true;
-				}
+				}	
+				
 				return
 			}
-
+			
 			//Event click on checkbox!
 			var cb = evt.target;
 			var check = evt.target.checked;
-
+			//JE edit
 			for (var i = 0, nb = this.drawBox.drawLayer.graphics.length; i < nb; i++) {
 				this.drawBox.drawLayer.graphics[i].checked = check;
+				if (check){
+					this.drawBox.drawLayer.graphics[i].show();
+				}else{
+					this.drawBox.drawLayer.graphics[i].hide();
+				};								
 				dom.byId('draw-action-checkclick--' + i).checked = check;
+
 			}
 			this.listCheckboxAll.checked = check;
 			this.listCheckboxAll.indeterminate = false;
@@ -680,6 +688,13 @@ define([
 				break;
 			case 'draw-action-checkclick':
 				g.checked = evt.target.checked;
+				//JE add
+				if (g.checked){
+					g.show();
+				} else{
+					g.hide();
+				};	
+				
 				this.listUpdateAllCheckbox();
 				break;
 			}
